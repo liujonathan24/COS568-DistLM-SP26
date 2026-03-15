@@ -131,8 +131,18 @@ def train(args, train_dataset, model, tokenizer):
             
             # TODO: Use first rank to collect and redistribute averaged losses
             if args.local_rank == 0:
-                loss = torch.distributed.gather(loss) # todo: fix
-                torch.distributed.scatter(loss)
+                    gather_list = [torch.zeros_like(loss) for i in range(args.world_size)]
+            else:
+                gather_list = None
+            torch.distributed.gather(loss, gather_list, dst=0) # has barrier functionality
+            
+            if args.local_rank == 0:
+                # average across gather_list
+                averaged_tensor = torch.stack(gather_list, dim=0).mean()
+                scatter_list = [averaged_tensor.clone() for _ in range(args.world_size)]
+            else:
+                scatter_list = None
+            torch.distributed.scatter(loss, scatter_list, src=0) # has barrier functionality
 
             if args.fp16:
                 with amp.scale_loss(loss, optimizer) as scaled_loss:
