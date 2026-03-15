@@ -95,6 +95,10 @@ def train(args, train_dataset, model, tokenizer):
             raise ImportError("Please install apex from https://www.github.com/nvidia/apex to use fp16 training.")
         model, optimizer = amp.initialize(model, optimizer, opt_level=args.fp16_opt_level)
 
+    # TODO: Setup communication
+    if args.local_rank == 0:
+        torch.distributed.init_process_group(backend="gloo", init_method=f"tcp://{args.master_ip}:{args.master_port}", rank=args.local_rank, world_size=args.world_size)
+
     # Train!
     logger.info("***** Running training *****")
     logger.info("  Num examples = %d", len(train_dataset))
@@ -124,6 +128,11 @@ def train(args, train_dataset, model, tokenizer):
 
             if args.gradient_accumulation_steps > 1:
                 loss = loss / args.gradient_accumulation_steps
+            
+            # TODO: Use first rank to collect and redistribute averaged losses
+            if args.local_rank == 0:
+                loss = torch.distributed.gather(loss) # todo: fix
+                torch.distributed.scatter(loss)
 
             if args.fp16:
                 with amp.scale_loss(loss, optimizer) as scaled_loss:
@@ -351,6 +360,13 @@ def main():
                              "See details at https://nvidia.github.io/apex/amp.html")
     parser.add_argument("--local_rank", type=int, default=-1,
                         help="For distributed training: local_rank. If single-node training, local_rank defaults to -1.")
+
+    # Distributed
+    parser.add_argument("--world_size", type=int, default=1,
+                        help="For distributed training: world_size. If single-node training, world_size defaults to 1.")
+    parser.add_argument("--master_port", type=int, default=-1, help="Master port for inter-node communication.")
+    parser.add_argument("--master_ip", type=int, default=-1, help="Master ip address for inter-node communication.")
+
     args = parser.parse_args()
 
     if os.path.exists(args.output_dir) and os.listdir(args.output_dir) and args.do_train and not args.overwrite_output_dir:

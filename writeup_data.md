@@ -1,6 +1,28 @@
+task 2a:
+- python run_glue.py [other input args] --master_ip $ip_address$ --master_port $port$ --world_size 4 --local_rank $rank$
+
+```
+export GLUE_DIR=$HOME/glue_data
+export TASK_NAME=RTE
+python3 run_glue.py   --model_type bert   --model_name_or_path bert-base-cased   --task_name $TASK_NAME   --do_train   --do_eval   --data_dir $GLUE_DIR/$TASK_NAME   --max_seq_length 128   --per_device_train_batch_size 64   --learning_rate 2e-5   --num_train_epochs 3   --output_dir /tmp/$TASK_NAME/   --overwrite_output_dir \
+--master_ip $ip_address$ --master_port $port$ --world_size 4 --local_rank [0-3]
+```
+
+
 task 1:
 
 - first 5 minibatches:
+
+Step 0: 0.7691709399223328 loss                                                                                                                   | 0/39 [00:00<?, ?it/s]
+
+Step 1: 0.7817338705062866 loss                                                                                                          | 1/39 [00:13<08:16, 13.07s/it]
+
+Step 2: 0.6885838508605957 loss                                                                                                          | 2/39 [00:22<06:53, 11.17s/it]
+
+Step 3: 0.7662752866744995 loss                                                                                                          | 3/39 [00:32<06:17, 10.47s/it]
+
+Step 4: 0.7341869473457336 loss                                                                                                          | 4/39 [00:41<05:45,  9.89s/it]
+
 
 - Full 3 epochs:
 jl0796@node-0:~/COS568-DistLM-SP26$ python3 run_glue.py   --model_type bert   --model_name_or_path bert-base-cased   --task_name $TASK_NAME   --do_train   --do_eval   --data_dir $GLUE_DIR/$TASK_NAME   --max_seq_length 128   --per_device_train_batch_size 64   --learning_rate 2e-5   --num_train_epochs 3   --output_dir /tmp/$TASK_NAME/   --overwrite_output_dir
