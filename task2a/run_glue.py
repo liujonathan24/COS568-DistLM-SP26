@@ -20,7 +20,6 @@ from __future__ import absolute_import, division, print_function
 import argparse
 import glob
 import logging
-import os
 import random
 
 import numpy as np
@@ -29,6 +28,15 @@ from torch.utils.data import (DataLoader, RandomSampler, SequentialSampler,
                               TensorDataset)
 from torch.utils.data.distributed import DistributedSampler
 from tqdm import tqdm, trange
+
+import sys
+import os
+
+# Get the absolute path of the parent directory
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+# Insert the parent directory at the beginning of the path
+sys.path.insert(0, parent_dir)
 
 # import a previous version of the HuggingFace Transformers package
 from pytorch_transformers import (WEIGHTS_NAME, BertConfig,
