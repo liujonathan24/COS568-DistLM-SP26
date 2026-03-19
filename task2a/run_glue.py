@@ -79,7 +79,7 @@ def train(args, train_dataset, model, tokenizer):
     """ Train the model """
 
     args.train_batch_size = args.per_device_train_batch_size
-    train_sampler = RandomSampler(train_dataset)
+    train_sampler = DistributedSampler(train_dataset)
     train_dataloader = DataLoader(train_dataset, sampler=train_sampler, batch_size=args.train_batch_size)
 
     if args.max_steps > 0:
@@ -201,7 +201,7 @@ def evaluate(args, model, tokenizer, prefix=""):
 
         args.eval_batch_size = args.per_device_eval_batch_size
         # Note that DistributedSampler samples randomly
-        eval_sampler = SequentialSampler(eval_dataset)
+        eval_sampler = DistributedSampler(eval_dataset)
         eval_dataloader = DataLoader(eval_dataset, sampler=eval_sampler, batch_size=args.eval_batch_size)
 
         # Eval!
@@ -424,11 +424,10 @@ def main():
     model = model_class.from_pretrained(args.model_name_or_path)
     ##################################################
 
-    if args.local_rank == 0:
-        # TODO: Setup communication
-        print("Initiating process group:")
-        torch.distributed.init_process_group(backend="gloo", init_method=f"tcp://{args.master_ip}:{args.master_port}", rank=args.local_rank, world_size=args.world_size) 
-        torch.distributed.barrier()  # Make sure only the first process in distributed training will download model & vocab
+    # TODO: Setup communication
+    print("Initiating process group:")
+    torch.distributed.init_process_group(backend="gloo", init_method=f"tcp://{args.master_ip}:{args.master_port}", rank=args.local_rank, world_size=args.world_size) 
+    torch.distributed.barrier()  # Make sure only the first process in distributed training will download model & vocab
 
     model.to(args.device)
 
