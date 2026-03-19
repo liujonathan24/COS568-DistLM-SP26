@@ -79,7 +79,10 @@ def train(args, train_dataset, model, tokenizer):
     """ Train the model """
 
     args.train_batch_size = args.per_device_train_batch_size
-    train_sampler = DistributedSampler(train_dataset)
+    if args.local_rank == -1:
+        train_sampler = RandomSampler(train_dataset)
+    else:
+        train_sampler = DistributedSampler(train_dataset, num_replicas=args.world_size, rank=args.local_rank)
     train_dataloader = DataLoader(train_dataset, sampler=train_sampler, batch_size=args.train_batch_size)
 
     if args.max_steps > 0:
@@ -133,21 +136,6 @@ def train(args, train_dataset, model, tokenizer):
             if args.gradient_accumulation_steps > 1:
                 loss = loss / args.gradient_accumulation_steps
             
-            # TODO: Use first rank to collect and redistribute averaged losses
-            if args.local_rank == 0:
-                    gather_list = [torch.zeros_like(loss) for i in range(args.world_size)]
-            else:
-                gather_list = None
-            torch.distributed.gather(loss, gather_list, dst=0) # has barrier functionality
-            
-            if args.local_rank == 0:
-                # average across gather_list
-                averaged_tensor = torch.stack(gather_list, dim=0).mean()
-                scatter_list = [averaged_tensor.clone() for _ in range(args.world_size)]
-            else:
-                scatter_list = None
-            torch.distributed.scatter(loss, scatter_list, src=0) # has barrier functionality
-
             if args.fp16:
                 with amp.scale_loss(loss, optimizer) as scaled_loss:
                     scaled_loss.backward()
@@ -159,6 +147,21 @@ def train(args, train_dataset, model, tokenizer):
                 
                 ##################################################
                 torch.nn.utils.clip_grad_norm_(model.parameters(), args.max_grad_norm)
+
+            if args.local_rank != -1:
+                for param in model.parameters():
+                    if param.grad is not None:
+                        if args.local_rank == 0:
+                            gather_list = [torch.zeros_like(param.grad) for _ in range(args.world_size)]
+                        else:
+                            gather_list = None
+                        torch.distributed.gather(param.grad, gather_list, dst=0)
+                        if args.local_rank == 0:
+                            averaged_grad = torch.stack(gather_list, dim=0).mean(dim=0)
+                            scatter_list = [averaged_grad.clone() for _ in range(args.world_size)]
+                        else:
+                            scatter_list = None
+                        torch.distributed.scatter(param.grad, scatter_list, src=0)
 
             tr_loss += loss.item()
             if (step + 1) % args.gradient_accumulation_steps == 0:
@@ -386,10 +389,11 @@ def main():
     if os.path.exists(args.output_dir) and os.listdir(args.output_dir) and args.do_train and not args.overwrite_output_dir:
         raise ValueError("Output directory ({}) already exists and is not empty. Use --overwrite_output_dir to overcome.".format(args.output_dir))
 
-    # TODO: Setup communication
-    print("Initiating process group:")
-    torch.distributed.init_process_group(backend="gloo", init_method=f"tcp://{args.master_ip}:{args.master_port}", rank=args.local_rank, world_size=args.world_size) 
-  
+    # Setup communication
+    if args.local_rank != -1:
+        print("Initiating process group:")
+        torch.distributed.init_process_group(backend="gloo", init_method=f"tcp://{args.master_ip}:{args.master_port}", rank=args.local_rank, world_size=args.world_size)
+
     # set up (distributed) training
     args.device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
     args.n_gpu = torch.cuda.device_count()
@@ -427,7 +431,7 @@ def main():
     ##################################################
     # TODO(cos568): load the model using from_pretrained. Remember to pass in `config` as an argument.
     # If you pass in args.model_name_or_path (e.g. "bert-base-cased"), the model weights file will be downloaded from HuggingFace. (expect one line of code)
-    model = model_class.from_pretrained(args.model_name_or_path)
+    model = model_class.from_pretrained(args.model_name_or_path, config=config)
     ##################################################
 
 
