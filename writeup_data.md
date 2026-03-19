@@ -1,3 +1,201 @@
+task 3:
+```
+cd /users/jl0796/COS568-DistLM-SP26/
+python download_glue_data.py
+cd /users/jl0796/COS568-DistLM-SP26/task2b
+export GLUE_DIR=$HOME/COS568-DistLM-SP26/glue_data
+export TASK_NAME=RTE
+export IP_ADDRESS=128.110.218.95
+export PORT=13579
+python3 run_glue.py   --model_type bert   --model_name_or_path bert-base-cased   --task_name $TASK_NAME   --do_train   --do_eval   --data_dir $GLUE_DIR/$TASK_NAME   --max_seq_length 128   --per_device_train_batch_size 16   --learning_rate 2e-5   --num_train_epochs 3   --output_dir /tmp/$TASK_NAME/   --overwrite_output_dir \
+--master_ip $IP_ADDRESS --master_port $PORT --world_size 4 --local_rank [0-3]
+```
+
+rank0:
+  Rank 0 Step 1: 0.8928709030151367 loss, 2.8005s                              | 1/39 [00:05<03:17,  5.21s/it]
+                                                                                                          Rank 0 Step 2: 0.6499286890029907 loss, 2.7297s                              | 2/39 [00:08<02:23,  3.89s/it]
+                                                                                                          Rank 0 Step 3: 0.6082603335380554 loss, 2.7265s                              | 3/39 [00:11<02:03,  3.43s/it]
+                                                                                                          Rank 0 Step 4: 0.7481549382209778 loss, 2.7764s                              | 4/39 [00:15<02:07,  3.64s/it]
+                                                                                                          Rank 0 Step 5: 0.7163246870040894 loss, 2.7312s                              | 5/39 [00:17<01:54,  3.38s/it]
+                                                                                                          Rank 0 Step 6: 0.712179958820343 loss, 2.7181s                               | 6/39 [00:20<01:45,  3.21s/it]
+                                                                                                          Rank 0 Step 7: 0.7204083204269409 loss, 2.6951s                              | 7/39 [00:23<01:39,  3.10s/it]
+                                                                                                          Rank 0 Step 8: 0.6837247610092163 loss, 2.6330s                              | 8/39 [00:26<01:33,  3.01s/it]
+                                                                                                          Rank 0 Step 9: 0.7025787830352783 loss, 2.6398s                              | 9/39 [00:29<01:28,  2.94s/it]
+                                                                                                          Rank 0 Step 10: 0.6743227243423462 loss, 2.6115s                            | 10/39 [00:32<01:23,  2.89s/it]
+                                                                                                          Rank 0 Step 11: 0.6346275806427002 loss, 2.6817s                            | 11/39 [00:34<01:19,  2.84s/it]
+                                                                                                          Rank 0 Step 12: 0.7356266379356384 loss, 2.6840s                            | 12/39 [00:37<01:16,  2.84s/it]
+                                                                                                          Rank 0 Step 13: 0.7202005982398987 loss, 2.6024s                            | 13/39 [00:40<01:13,  2.83s/it]
+                                                                                                          Rank 0 Step 14: 0.6969020366668701 loss, 2.6146s                            | 14/39 [00:43<01:10,  2.80s/it]
+                                                                                                          Rank 0 Step 15: 0.6632838249206543 loss, 2.6193s                            | 15/39 [00:45<01:06,  2.79s/it]
+                                                                                                          Rank 0 Step 16: 0.7012203335762024 loss, 2.6381s                            | 16/39 [00:48<01:03,  2.78s/it]
+                                                                                                          Rank 0 Step 17: 0.6528066992759705 loss, 2.6174s                            | 17/39 [00:51<01:01,  2.78s/it]
+                                                                                                          Rank 0 Step 18: 0.6856709122657776 loss, 2.6717s                            | 18/39 [00:54<00:58,  2.77s/it]
+                                                                                                          Rank 0 Step 19: 0.6888301968574524 loss, 2.6606s                            | 19/39 [00:57<00:55,  2.78s/it]
+                                                                                                          Rank 0 Step 20: 0.6908309459686279 loss, 2.7099s                            | 20/39 [00:59<00:52,  2.79s/it]
+                                                                                                          Rank 0 Step 21: 0.6993993520736694 loss, 2.6509s▊                           | 21/39 [01:02<00:50,  2.81s/it]
+                                                                                                          Rank 0 Step 22: 0.6756142377853394 loss, 2.6558s██▎                         | 22/39 [01:05<00:47,  2.80s/it]
+                                                                                                          Rank 0 Step 23: 0.668753981590271 loss, 2.6933s████▊                        | 23/39 [01:08<00:44,  2.80s/it]
+                                                                                                          Rank 0 Step 24: 0.6765525937080383 loss, 2.6153s█████▎                      | 24/39 [01:11<00:42,  2.81s/it]
+                                                                                                          Rank 0 Step 25: 0.6721910834312439 loss, 2.6235s██████▊                     | 25/39 [01:13<00:39,  2.79s/it]
+                                                                                                          Rank 0 Step 26: 0.6468062996864319 loss, 2.6397s████████▎                   | 26/39 [01:16<00:36,  2.78s/it]
+                                                                                                          Rank 0 Step 27: 0.6363000273704529 loss, 2.7015s█████████▊                  | 27/39 [01:19<00:33,  2.78s/it]
+                                                                                                          Rank 0 Step 28: 0.6307457685470581 loss, 2.6236s███████████▎                | 28/39 [01:22<00:30,  2.80s/it]
+                                                                                                          Rank 0 Step 29: 0.6405341029167175 loss, 2.6637s████████████▊               | 29/39 [01:24<00:27,  2.79s/it]
+                                                                                                          Rank 0 Step 30: 0.7167795896530151 loss, 2.6755s██████████████▍             | 30/39 [01:27<00:25,  2.79s/it]
+                                                                                                          Rank 0 Step 31: 0.6874585747718811 loss, 2.6699s███████████████▉            | 31/39 [01:30<00:22,  2.80s/it]
+                                                                                                          Rank 0 Step 32: 0.6785904169082642 loss, 2.6377s█████████████████▍          | 32/39 [01:33<00:19,  2.80s/it]
+                                                                                                          Rank 0 Step 33: 0.7177387475967407 loss, 2.6128s██████████████████▉         | 33/39 [01:36<00:16,  2.79s/it]
+                                                                                                          Rank 0 Step 34: 0.7194638252258301 loss, 2.6494s████████████████████▍       | 34/39 [01:38<00:13,  2.78s/it]
+                                                                                                          Rank 0 Step 35: 0.6533253192901611 loss, 2.6499s█████████████████████▉      | 35/39 [01:41<00:11,  2.78s/it]
+                                                                                                          Rank 0 Step 36: 0.6592704057693481 loss, 2.6575s███████████████████████▍    | 36/39 [01:44<00:08,  2.78s/it]
+                                                                                                          Rank 0 Step 37: 0.7123329043388367 loss, 2.6257s████████████████████████▉   | 37/39 [01:47<00:05,  2.79s/it]
+                                                                                                          Rank 0 Step 38: 0.6418021321296692 loss, 2.4812s██████████████████████████▍ | 38/39 [01:50<00:02,  2.78s/it]
+Iteration: 100%|███████████████████████████████████████████████████████████| 39/39 [01:52<00:00,  2.89s/it]
+03/19/2026 15:23:54 - INFO - __main__ -   Loading features from cached file /users/jl0796/COS568-DistLM-SP26/glue_data/RTE/cached_dev_bert-base-cased_128_rte
+03/19/2026 15:23:54 - INFO - __main__ -   ***** Running evaluation  *****
+03/19/2026 15:23:54 - INFO - __main__ -     Num examples = 277
+03/19/2026 15:23:54 - INFO - __main__ -     Batch size = 8
+Evaluating: 100%|████████████████████████████████████████████████████████████| 9/9 [00:03<00:00,  2.98it/s]
+03/19/2026 15:23:57 - INFO - __main__ -   ***** Eval results  *****██████████| 9/9 [00:03<00:00,  3.14it/s]
+03/19/2026 15:23:57 - INFO - __main__ -     acc = 0.5285714285714286
+{'acc': np.float64(0.5285714285714286)}
+Epoch: 100%|████████████████████████████████████████████████████████████████| 1/1 [01:55<00:00, 115.72s/it]
+03/19/2026 15:23:58 - INFO - __main__ -    global_step = 39, average loss = 0.6936845259788709
+03/19/2026 15:23:58 - INFO - __main__ -   Loading features from cached file /users/jl0796/COS568-DistLM-SP26/glue_data/RTE/cached_dev_bert-base-cased_128_rte
+03/19/2026 15:23:58 - INFO - __main__ -   ***** Running evaluation  *****
+03/19/2026 15:23:58 - INFO - __main__ -     Num examples = 277
+03/19/2026 15:23:58 - INFO - __main__ -     Batch size = 8
+Evaluating: 100%|████████████████████████████████████████████████████████████| 9/9 [00:03<00:00,  2.99it/s]
+03/19/2026 15:24:01 - INFO - __main__ -   ***** Eval results  *****
+03/19/2026 15:24:01 - INFO - __main__ -     acc = 0.5285714285714286
+
+rank1:
+Rank 1 Step 1: 0.7918104529380798 loss, 2.8108s
+Rank 1 Step 2: 0.7261569499969482 loss, 2.7294s
+Rank 1 Step 3: 0.6006006598472595 loss, 2.7279s
+Rank 1 Step 4: 0.671589732170105 loss, 2.7846s
+Rank 1 Step 5: 0.649652361869812 loss, 2.7246s
+Rank 1 Step 6: 0.6816576719284058 loss, 2.7368s
+Rank 1 Step 7: 0.7670220732688904 loss, 2.6887s
+Rank 1 Step 8: 0.7426831126213074 loss, 2.6311s
+Rank 1 Step 9: 0.6736165285110474 loss, 2.6414s
+Rank 1 Step 10: 0.6864630579948425 loss, 2.6100s
+Rank 1 Step 11: 0.7301202416419983 loss, 2.6784s
+Rank 1 Step 12: 0.6975117325782776 loss, 2.6877s
+Rank 1 Step 13: 0.6921250820159912 loss, 2.6026s
+Rank 1 Step 14: 0.7272283434867859 loss, 2.6145s
+Rank 1 Step 15: 0.6534180045127869 loss, 2.6180s
+Rank 1 Step 16: 0.6618313789367676 loss, 2.6393s
+Rank 1 Step 17: 0.7106463313102722 loss, 2.6155s
+Rank 1 Step 18: 0.6821306943893433 loss, 2.6725s
+Rank 1 Step 19: 0.6719106435775757 loss, 2.6597s
+Rank 1 Step 20: 0.6581270694732666 loss, 2.7109s
+Rank 1 Step 21: 0.6778276562690735 loss, 2.6483s
+Rank 1 Step 22: 0.634501576423645 loss, 2.6548s
+Rank 1 Step 23: 0.6647440791130066 loss, 2.6918s
+Rank 1 Step 24: 0.6870583891868591 loss, 2.6163s
+Rank 1 Step 25: 0.6760925054550171 loss, 2.6239s
+Rank 1 Step 26: 0.7045295238494873 loss, 2.6393s
+Rank 1 Step 27: 0.7360819578170776 loss, 2.6950s
+Rank 1 Step 28: 0.7226952910423279 loss, 2.6384s
+Rank 1 Step 29: 0.658108115196228 loss, 2.6613s
+Rank 1 Step 30: 0.7169983983039856 loss, 2.6746s
+Rank 1 Step 31: 0.6600024700164795 loss, 2.6675s
+Rank 1 Step 32: 0.6641342043876648 loss, 2.6410s
+Rank 1 Step 33: 0.7266454100608826 loss, 2.6115s
+Rank 1 Step 34: 0.7093887329101562 loss, 2.6510s
+Rank 1 Step 35: 0.6652270555496216 loss, 2.6491s
+Rank 1 Step 36: 0.6681618690490723 loss, 2.6532s
+Rank 1 Step 37: 0.689782977104187 loss, 2.6271s
+Rank 1 Step 38: 0.7069808840751648 loss, 2.4786s
+Evaluating: 100%|████████████████████████████████████████████████████████████| 9/9 [00:03<00:00,  2.96it/s]
+{'acc': np.float64(0.7285714285714285)}
+
+
+rank2:
+Rank 2 Step 1: 0.6797139048576355 loss, 2.7999s
+Rank 2 Step 2: 0.7076496481895447 loss, 2.7309s
+Rank 2 Step 3: 0.6400177478790283 loss, 2.7274s
+Rank 2 Step 4: 0.7028261423110962 loss, 2.8055s
+Rank 2 Step 5: 0.7736439108848572 loss, 2.7300s
+Rank 2 Step 6: 0.6513296365737915 loss, 2.7317s
+Rank 2 Step 7: 0.751022219657898 loss, 2.6890s
+Rank 2 Step 8: 0.6548188328742981 loss, 2.6317s
+Rank 2 Step 9: 0.707629382610321 loss, 2.6384s
+Rank 2 Step 10: 0.6588904857635498 loss, 2.6097s
+Rank 2 Step 11: 0.6145505309104919 loss, 2.6798s
+Rank 2 Step 12: 0.6967117786407471 loss, 2.6870s
+Rank 2 Step 13: 0.6983460783958435 loss, 2.6041s
+Rank 2 Step 14: 0.64417964220047 loss, 2.6153s
+Rank 2 Step 15: 0.6789699196815491 loss, 2.6163s
+Rank 2 Step 16: 0.6519253849983215 loss, 2.6398s
+Rank 2 Step 17: 0.7012290954589844 loss, 2.6178s
+Rank 2 Step 18: 0.691001296043396 loss, 2.6712s
+Rank 2 Step 19: 0.6754285097122192 loss, 2.6602s
+Rank 2 Step 20: 0.6873687505722046 loss, 2.7127s
+Rank 2 Step 21: 0.7326023578643799 loss, 2.6472s
+Rank 2 Step 22: 0.6204068660736084 loss, 2.6555s
+Rank 2 Step 23: 0.6833940148353577 loss, 2.6930s
+Rank 2 Step 24: 0.6525702476501465 loss, 2.6163s
+Rank 2 Step 25: 0.6798869967460632 loss, 2.6244s
+Rank 2 Step 26: 0.7147308588027954 loss, 2.6373s
+Rank 2 Step 27: 0.723520815372467 loss, 2.6996s
+Rank 2 Step 28: 0.6681506633758545 loss, 2.6357s
+Rank 2 Step 29: 0.697526752948761 loss, 2.6628s
+Rank 2 Step 30: 0.6580085754394531 loss, 2.6728s
+Rank 2 Step 31: 0.6505770087242126 loss, 2.6719s
+Rank 2 Step 32: 0.6886754631996155 loss, 2.6380s
+Rank 2 Step 33: 0.6778713464736938 loss, 2.6156s
+Rank 2 Step 34: 0.7074357271194458 loss, 2.6474s
+Rank 2 Step 35: 0.6593215465545654 loss, 2.6492s
+Rank 2 Step 36: 0.681056022644043 loss, 2.6604s
+Rank 2 Step 37: 0.695023238658905 loss, 2.6262s
+Rank 2 Step 38: 0.7639906406402588 loss, 2.4686s
+Evaluating: 100%|████████████████████████████████████████████████████████████| 9/9 [00:03<00:00,  2.96it/s]
+{'acc': np.float64(0.5857142857142857)}
+
+rank3:
+Rank 3 Step 1: 0.6271342039108276 loss, 2.8020s
+Rank 3 Step 2: 0.733111560344696 loss, 2.7326s
+Rank 3 Step 3: 0.7530367970466614 loss, 2.7307s
+Rank 3 Step 4: 0.7701762318611145 loss, 2.7694s
+Rank 3 Step 5: 0.7852979302406311 loss, 2.7309s
+Rank 3 Step 6: 0.6773862838745117 loss, 2.7324s
+Rank 3 Step 7: 0.7240059971809387 loss, 2.6931s
+Rank 3 Step 8: 0.6956485509872437 loss, 2.6320s
+Rank 3 Step 9: 0.7058278322219849 loss, 2.6383s
+Rank 3 Step 10: 0.7347922921180725 loss, 2.6108s
+Rank 3 Step 11: 0.7404108047485352 loss, 2.6812s
+Rank 3 Step 12: 0.6911787390708923 loss, 2.6863s
+Rank 3 Step 13: 0.6838893890380859 loss, 2.6052s
+Rank 3 Step 14: 0.6942996382713318 loss, 2.6132s
+Rank 3 Step 15: 0.723535418510437 loss, 2.6192s
+Rank 3 Step 16: 0.6867842674255371 loss, 2.6413s
+Rank 3 Step 17: 0.7014889717102051 loss, 2.6087s
+Rank 3 Step 18: 0.6868188381195068 loss, 2.6681s
+Rank 3 Step 19: 0.6634982824325562 loss, 2.6614s
+Rank 3 Step 20: 0.6566498279571533 loss, 2.7091s
+Rank 3 Step 21: 0.6318873167037964 loss, 2.6517s
+Rank 3 Step 22: 0.7325892448425293 loss, 2.6577s
+Rank 3 Step 23: 0.66378253698349 loss, 2.6924s
+Rank 3 Step 24: 0.6736941933631897 loss, 2.6179s
+Rank 3 Step 25: 0.7446627616882324 loss, 2.6246s
+Rank 3 Step 26: 0.7009887099266052 loss, 2.6379s
+Rank 3 Step 27: 0.6627845764160156 loss, 2.6969s
+Rank 3 Step 28: 0.7231649160385132 loss, 2.6361s
+Rank 3 Step 29: 0.6134838461875916 loss, 2.6632s
+Rank 3 Step 30: 0.6876940727233887 loss, 2.6726s
+Rank 3 Step 31: 0.6324418783187866 loss, 2.6707s
+Rank 3 Step 32: 0.6902807950973511 loss, 2.6419s
+Rank 3 Step 33: 0.6070387363433838 loss, 2.6156s
+Rank 3 Step 34: 0.6718780398368835 loss, 2.6485s
+Rank 3 Step 35: 0.6596216559410095 loss, 2.6484s
+Rank 3 Step 36: 0.6989961862564087 loss, 2.6603s
+Rank 3 Step 37: 0.6583592891693115 loss, 2.6260s
+Rank 3 Step 38: 0.6860821843147278 loss, 2.4798s
+Evaluating: 100%|████████████████████████████████████████████████████████████| 9/9 [00:03<00:00,  2.96it/s]
+{'acc': np.float64(0.5428571428571428)}
+
 task 2b:
 - python run_glue.py [other input args] --master_ip $ip_address$ --master_port $port$ --world_size 4 --local_rank $rank$
 
