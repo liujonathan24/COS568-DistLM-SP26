@@ -21,6 +21,7 @@ import argparse
 import glob
 import logging
 import random
+import time
 
 import numpy as np
 import torch
@@ -121,9 +122,19 @@ def train(args, train_dataset, model, tokenizer):
     model.zero_grad()
     train_iterator = trange(int(args.num_train_epochs), desc="Epoch", disable=args.local_rank not in [-1, 0])
     set_seed(args)  # Added here for reproductibility (even between python 2 and 3)
+    prof = torch.profiler.profile(
+        schedule=torch.profiler.schedule(wait=0, warmup=1, active=3, repeat=1),
+        on_trace_ready=torch.profiler.tensorboard_trace_handler(
+            os.path.join(args.output_dir, f"profiler_rank{args.local_rank}")
+        ),
+        record_shapes=True,
+        with_stack=True,
+    )
+    prof.start()
     for _ in train_iterator:
         epoch_iterator = tqdm(train_dataloader, desc="Iteration", disable=args.local_rank not in [-1, 0])
         for step, batch in enumerate(epoch_iterator):
+            iter_start = time.perf_counter()
             model.train()
             batch = tuple(t.to(args.device) for t in batch)
             inputs = {'input_ids':      batch[0],
@@ -135,7 +146,7 @@ def train(args, train_dataset, model, tokenizer):
 
             if args.gradient_accumulation_steps > 1:
                 loss = loss / args.gradient_accumulation_steps
-            
+
             if args.fp16:
                 with amp.scale_loss(loss, optimizer) as scaled_loss:
                     scaled_loss.backward()
@@ -144,7 +155,7 @@ def train(args, train_dataset, model, tokenizer):
                 ##################################################
                 # TODO(cos568): perform backward pass here (expect one line of code)
                 loss.backward()
-                
+
                 ##################################################
                 torch.nn.utils.clip_grad_norm_(model.parameters(), args.max_grad_norm)
 
@@ -158,26 +169,29 @@ def train(args, train_dataset, model, tokenizer):
             if (step + 1) % args.gradient_accumulation_steps == 0:
                 ##################################################
                 # TODO(cos568): perform a single optimization step (parameter update) by invoking the optimizer (expect one line of code)
-                print(f"Rank {args.local_rank} Step {step}: {loss.item()} loss") # Part 1
+                iter_time = time.perf_counter() - iter_start
+                print(f"Rank {args.local_rank} Step {step}: {loss.item()} loss, {iter_time:.4f}s")
                 optimizer.step()
                 ##################################################
                 scheduler.step() # Update learning rate schedule
                 model.zero_grad()
                 global_step += 1
 
+            prof.step()
             if args.max_steps > 0 and global_step > args.max_steps:
                 epoch_iterator.close()
                 break
         if args.max_steps > 0 and global_step > args.max_steps:
             train_iterator.close()
             break
-        
+
         ##################################################
         # TODO(cos568): call evaluate() here to get the model performance after every epoch. (expect one line of code)
         results = evaluate(args, model, tokenizer)
         print(results)
         ##################################################
 
+    prof.stop()
     return global_step, tr_loss / global_step
 
 
