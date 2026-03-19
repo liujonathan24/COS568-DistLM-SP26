@@ -395,6 +395,12 @@ def main():
     args.device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
     args.n_gpu = torch.cuda.device_count()
 
+    # Setup communication
+    if args.local_rank != -1:
+        torch.distributed.init_process_group(
+            backend="gloo", world_size=args.world_size, rank=args.local_rank, init_method=f"tcp://{args.master_ip}:{args.master_port}"
+        )
+
     # Setup logging
     logging.basicConfig(format = '%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                         datefmt = '%m/%d/%Y %H:%M:%S',
@@ -424,18 +430,11 @@ def main():
     config_class, model_class, tokenizer_class = MODEL_CLASSES[args.model_type]
     config = config_class.from_pretrained(args.config_name if args.config_name else args.model_name_or_path, num_labels=num_labels, finetuning_task=args.task_name)
     tokenizer = tokenizer_class.from_pretrained(args.tokenizer_name if args.tokenizer_name else args.model_name_or_path, do_lower_case=args.do_lower_case)
-    
+
     ##################################################
     # TODO(cos568): load the model using from_pretrained. Remember to pass in `config` as an argument.
     # If you pass in args.model_name_or_path (e.g. "bert-base-cased"), the model weights file will be downloaded from HuggingFace. (expect one line of code)
     model = model_class.from_pretrained(args.model_name_or_path, config=config)
-
-
-    # Setup communication
-    if args.local_rank != -1:
-        torch.distributed.init_process_group(
-            backend="gloo", world_size=args.world_size, rank=args.local_rank, init_method=f"tcp://{args.master_ip}:{args.master_port}"
-        )
     ##################################################
 
 
