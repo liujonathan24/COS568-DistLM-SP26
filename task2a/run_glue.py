@@ -389,7 +389,6 @@ def main():
     # TODO: Setup communication
     print("Initiating process group:")
     torch.distributed.init_process_group(backend="gloo", init_method=f"tcp://{args.master_ip}:{args.master_port}", rank=args.local_rank, world_size=args.world_size) 
-    torch.distributed.barrier()  # Make sure only the first process in distributed training will download model & vocab
   
     # set up (distributed) training
     args.device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
@@ -418,6 +417,8 @@ def main():
     if args.local_rank not in [-1, 0]:
         torch.distributed.barrier()  # Make sure only the first process in distributed training will download model & vocab
 
+    if args.local_rank in [0]:
+      torch.distributed.barrier()  # Make sure only the first process in distributed training will download model & vocab
     args.model_type = args.model_type.lower()
     config_class, model_class, tokenizer_class = MODEL_CLASSES[args.model_type]
     config = config_class.from_pretrained(args.config_name if args.config_name else args.model_name_or_path, num_labels=num_labels, finetuning_task=args.task_name)
