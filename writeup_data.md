@@ -2,11 +2,14 @@ task 2a:
 - python run_glue.py [other input args] --master_ip $ip_address$ --master_port $port$ --world_size 4 --local_rank $rank$
 
 ```
-export GLUE_DIR=$HOME/glue_data
+cd /users/jl0796/COS568-DistLM-SP26/
+python download_glue_data.py
+cd /users/jl0796/COS568-DistLM-SP26/task2a
+export GLUE_DIR=$HOME/COS568-DistLM-SP26/glue_data
 export TASK_NAME=RTE
-export IP_ADDRESS=127.0.0.1
+export IP_ADDRESS=128.110.218.95
 export PORT=13579
-python3 run_glue.py   --model_type bert   --model_name_or_path bert-base-cased   --task_name $TASK_NAME   --do_train   --do_eval   --data_dir $GLUE_DIR/$TASK_NAME   --max_seq_length 128   --per_device_train_batch_size 64   --learning_rate 2e-5   --num_train_epochs 3   --output_dir /tmp/$TASK_NAME/   --overwrite_output_dir \
+python3 run_glue.py   --model_type bert   --model_name_or_path bert-base-cased   --task_name $TASK_NAME   --do_train   --do_eval   --data_dir $GLUE_DIR/$TASK_NAME   --max_seq_length 128   --per_device_train_batch_size 16   --learning_rate 2e-5   --num_train_epochs 3   --output_dir /tmp/$TASK_NAME/   --overwrite_output_dir \
 --master_ip $IP_ADDRESS --master_port $PORT --world_size 4 --local_rank [0-3]
 ```
 master_ip is: 10.10.1.2
