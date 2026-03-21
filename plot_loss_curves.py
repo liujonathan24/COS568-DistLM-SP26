@@ -63,6 +63,10 @@ task2a = {
 
 steps = list(range(1, 39))
 
+# Task 1 data (single-node, batch size 64) - only first 5 steps logged
+task1_loss = [0.7691709399223328, 0.7817338705062866, 0.6885838508605957, 0.7662752866744995, 0.7341869473457336]
+task1_steps = list(range(0, 5))
+
 # --- Plot loss curves ---
 fig, axes = plt.subplots(2, 2, figsize=(14, 10), sharex=True, sharey=True)
 fig.suptitle("Loss Curves by Rank for Each Communication Method", fontsize=14)
@@ -81,6 +85,23 @@ for idx, rank in enumerate([0, 1, 2, 3]):
 plt.tight_layout()
 plt.savefig("loss_curves.png", dpi=150, bbox_inches="tight")
 print("Saved loss_curves.png")
+
+# --- Plot first 5 minibatch losses comparison ---
+fig2, ax2 = plt.subplots(figsize=(8, 5))
+fig2.suptitle("First 5 Minibatch Losses: Task 1 vs Distributed (Rank 0)", fontsize=13)
+
+ax2.plot(task1_steps, task1_loss, marker='o', label="Task 1 (single-node, bs=64)", linewidth=2)
+ax2.plot(list(range(1, 6)), [task2a[0]["loss"][i] for i in range(5)], marker='s', label="Task 2a Rank 0 (gather/scatter)", linewidth=2)
+ax2.plot(list(range(1, 6)), [task2b[0]["loss"][i] for i in range(5)], marker='^', label="Task 2b Rank 0 (all_reduce)", linewidth=2, linestyle='--')
+ax2.plot(list(range(1, 6)), [task3[0]["loss"][i] for i in range(5)], marker='d', label="Task 3 Rank 0 (DDP)", linewidth=2)
+ax2.set_xlabel("Step")
+ax2.set_ylabel("Loss")
+ax2.legend(fontsize=9)
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.savefig("first5_loss.png", dpi=150, bbox_inches="tight")
+print("Saved first5_loss.png")
 
 # --- Compute average timings (excluding step 1) ---
 print("\n=== Average Time Per Iteration (excluding step 1) ===\n")
